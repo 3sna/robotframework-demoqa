@@ -1,0 +1,25 @@
+# Python virtual environment
+.venv/
+
+# PyCharm local settings
+.idea/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Robot Framework generated reports
+output.xml
+log.html
+report.html
+
+# Operating system files
+.DS_Store
+
+# Generated Robot Framework reports
+reports/*
+!reports/.gitkeep
+
+# Browser screenshots and logs
+browser/
+playwright-log.txt
