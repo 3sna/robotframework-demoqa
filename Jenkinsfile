@@ -17,8 +17,8 @@ pipeline {
     stages {
         stage('Checkout GitHub Project') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/3sna/robotframework-demoqa.git'
+                // Reuses the job's repository, branch and credentials
+                checkout scm
             }
         }
 
