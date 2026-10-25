@@ -23,3 +23,6 @@ reports/*
 # Browser screenshots and logs
 browser/
 playwright-log.txt
+
+# Default python fil
+main.py
