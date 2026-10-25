@@ -8,7 +8,7 @@ Suite Teardown    Close Browser
 ${URL}    https://demoqa.com/webtables
 
 *** Test Cases ***
-TC01 - Web Tables Page Is Accessible
+TC00 - Web Tables Page Is Accessible
     Wait For Elements State    id=addNewRecordButton    visible    timeout=20s
     Wait For Elements State    id=searchBox    visible    timeout=20s
     Wait For Elements State    .rt-tbody    visible    timeout=20s
