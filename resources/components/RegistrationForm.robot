@@ -4,7 +4,8 @@ Library          Browser
 Resource         ../common/data.robot
 
 *** Variables ***
-${RF_MODAL}     css=div[role='dialog']
+# The modal loses "show" as soon as it closes, then stays in the DOM until its fade-out ends
+${RF_MODAL_SHOWN}    css=div[role='dialog'].show
 ${RF_FORM}      id=userForm
 ${RF_SUBMIT}    id=submit
 ${RF_CLOSE}     css=.modal-content button.btn-close
@@ -37,7 +38,9 @@ Close Registration Form
     Registration Form Should Be Closed
 
 Registration Form Should Be Closed
-    Wait For Elements State    ${RF_MODAL}    detached    timeout=${TIMEOUT}
+    [Documentation]    Checks what the user sees: the modal is no longer shown.
+    ...                Waiting for it to leave the DOM depends on the fade-out ending, which can hang.
+    Wait For Elements State    ${RF_MODAL_SHOWN}    detached    timeout=${TIMEOUT}
 
 Registration Form Should Be Rejected
     [Documentation]    After a refused submit, the form gets "was-validated" and stays open.
