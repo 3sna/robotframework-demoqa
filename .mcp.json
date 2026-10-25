@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "rf-mcp": {
+      "type": "stdio",
+      "command": "/Users/trisnaekowiyatni/robotframework-demoqa/.venv/bin/rf-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
