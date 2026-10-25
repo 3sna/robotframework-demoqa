@@ -26,3 +26,9 @@ playwright-log.txt
 
 # Default python fil
 main.py
+
+# Local Claude Code MCP config (machine-specific path)
+.mcp.json
+
+# Delivery archive
+*.zip

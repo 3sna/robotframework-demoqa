@@ -27,7 +27,7 @@ pipeline {
                 sh '''
                     python3 -m venv .venv
                     .venv/bin/python -m pip install --upgrade pip
-                    .venv/bin/pip install "robotframework-browser[bb]"
+                    .venv/bin/pip install -r requirements.txt
                     .venv/bin/rfbrowser install chromium
                 '''
             }
@@ -42,10 +42,12 @@ pipeline {
                             if [ "$TEST_ID" = "All" ] || [ -z "$TEST_ID" ]; then
                                 .venv/bin/robot \
                                     --outputdir reports \
+                                    --variable HEADLESS:True \
                                     tests/
                             else
                                 .venv/bin/robot \
                                     --outputdir reports \
+                                    --variable HEADLESS:True \
                                     --test "$TEST_ID *" \
                                     tests/
                             fi
