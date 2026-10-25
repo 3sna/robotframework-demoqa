@@ -2,8 +2,9 @@
 Documentation    Feature: Manage employees
 ...              As a user, I want to add, edit and delete employees in the table,
 ...              so that the list stays up to date.
-Resource         ../../resources/steps/web_tables_steps.robot
+Resource         ../../resources/steps/web_tables_steps.resource
 Test Setup       Given the user is on the Web Tables page
+
 
 *** Test Cases ***
 Scenario: TC01 - The table shows the default employees

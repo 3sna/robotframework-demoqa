@@ -1,1 +1,14 @@
 output-dir = "reports"
+
+[tool.robocop.lint]
+ignore = [
+    # Gherkin steps are sentences ("the user adds the employee ...") and
+    # scenarios start with "Scenario:": the Title Case convention does not apply
+    "NAME02",  # wrong-case-in-keyword-name
+    "NAME18",  # wrong-case-in-keyword-call
+    # Scenario names and step sentences document themselves
+    "DOC01",   # missing-doc-keyword
+    "DOC02",   # missing-doc-test-case
+    # "VAR &{x}" is flagged by MISC04 (no "=" sign): keep "&{x}=    Create Dictionary"
+    "DEPR06",  # replace-create-with-var
+]

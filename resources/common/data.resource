@@ -1,3 +1,7 @@
+*** Settings ***
+Documentation    Test data: application URL, browser options and employees by alias.
+
+
 *** Variables ***
 ${URL}         https://demoqa.com/webtables
 ${BROWSER}     chromium

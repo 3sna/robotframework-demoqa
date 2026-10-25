@@ -40,21 +40,24 @@ How the checks work:
 
     resources/
       common/
-        data.robot               Test data: URL, browser, employees by alias
-        browser.robot            Browser lifecycle, "no page reload" flag
+        data.resource              Test data: URL, browser, employees by alias
+        browser.resource           Browser lifecycle, "no page reload" flag
       pages/
-        WebTablesPage.robot      Page object: table, Add button, search, row icons
+        WebTablesPage.resource     Page object: table, Add button, search, row icons
       components/
-        RegistrationForm.robot   Component object: the Add / Edit modal form
+        RegistrationForm.resource  Component object: the Add / Edit modal form
       steps/
-        web_tables_steps.robot   Business steps used by the scenarios
+        web_tables_steps.resource  Business steps used by the scenarios
     tests/
-      __init__.robot             Opens the browser once for the whole run
+      __init__.robot               Opens the browser once for the whole run
       features/
-        manage_employees.robot   TC01-TC10, TC22
-        form_validation.robot    TC11-TC21 (Scenario Outline for negative cases)
-    Jenkinsfile                  CI pipeline
-    requirements.txt             Pinned Python dependencies
+        manage_employees.robot     TC01-TC10, TC22
+        form_validation.robot      TC11-TC21 (Scenario Outline for negative cases)
+    Jenkinsfile                    CI pipeline
+    requirements.txt               Pinned Python dependencies
+    requirements-dev.txt           Development tools: Robocop, pre-commit
+    robot.toml                     Robot Framework and Robocop settings
+    .pre-commit-config.yaml        Git hook: Robocop lint before each commit
 
 The layers only call the layer below them:
 
@@ -64,7 +67,7 @@ The layers only call the layer below them:
 - **Steps** are sentences with embedded arguments, such as
   `the employee "${alias}" is displayed in the table`. They call page and
   component objects only. Employees are referenced by alias (`cierra`,
-  `alice`, `alicia`...) and looked up in `&{EMPLOYEES}` in `data.robot`.
+  `alice`, `alicia`...) and looked up in `&{EMPLOYEES}` in `data.resource`.
 - **Page and component objects** are the only files that know the selectors.
   When DemoQA changes its HTML, only these files need an update. The form is a
   component because the same modal is used to add and to edit.
@@ -136,6 +139,16 @@ If PowerShell refuses to run `Activate.ps1`, allow local scripts once:
 
 In `cmd.exe`, activate with `.venv\Scripts\activate.bat` instead.
 
+### Development tools (all OS)
+
+To change the tests, also install the linter and the Git hook, with the
+virtual environment activated:
+
+    pip install -r requirements-dev.txt
+    pre-commit install
+
+See [Code quality](#code-quality).
+
 ## Run the tests
 
 With the virtual environment activated, the commands are the same on every OS.
@@ -159,6 +172,49 @@ By tag:
 
 Reports are written to `reports/` (`report.html`, `log.html`, `output.xml`,
 plus a screenshot on failure). They are excluded from Git.
+
+## Code quality
+
+The Robot Framework code is checked with
+[Robocop](https://robocop.dev), the Robot Framework linter.
+
+**Before each commit.** `pre-commit install` adds a Git hook: every
+`git commit` runs Robocop on the staged `.robot` and `.resource` files. If
+Robocop finds an issue, the commit is cancelled and the issues are listed with
+their file, line and rule. Fix them, `git add` the files again and commit.
+The hook runs at commit time, so code that reaches `git push` has been linted.
+
+The hook installs Robocop in its own environment (managed by pre-commit), so
+it works without activating `.venv`, on macOS, Linux and Windows.
+
+**Run it by hand:**
+
+    robocop check                      # whole project
+    robocop check tests/features/      # one folder
+    pre-commit run --all-files         # same check as the Git hook
+
+**Configuration.** Rules are set in `robot.toml`, under
+`[tool.robocop.lint]`. A few rules are turned off on purpose, each with its
+reason in a comment:
+
+| Rule | Why it is off |
+|---|---|
+| `NAME02`, `NAME18` | Gherkin steps are sentences (`the user adds the employee "alice"`), not Title Case keyword names |
+| `DOC01`, `DOC02` | Scenario names and step sentences document themselves |
+| `DEPR06` | Its fix (`VAR &{x}`) triggers `MISC04`; the code keeps `&{x}=    Create Dictionary` |
+
+To ignore a rule on a single line, add a comment at the end of it:
+
+    Some Keyword    ${arg}    # robocop: off=rule-name
+
+**Skipping the hook.** `git commit --no-verify` skips it, for an emergency
+only.
+
+**Formatter.** Robocop also has a formatter (`robocop format`). It is not part
+of the hook, because it would realign the hand-aligned columns in
+`data.resource` and in the `Test Template` tables. To preview its changes
+without writing them, use `robocop format --check --diff`: `--diff` alone
+rewrites the files.
 
 ## Jenkins
 

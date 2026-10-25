@@ -1,8 +1,10 @@
 *** Settings ***
 Documentation    Page object for https://demoqa.com/webtables: the table, its toolbar and row actions.
 ...              Only this file knows the page selectors.
+Library          Collections
 Library          Browser
-Resource         ../common/data.robot
+Resource         ../common/data.resource
+
 
 *** Variables ***
 ${WT_ADD_BUTTON}    id=addNewRecordButton
@@ -10,6 +12,7 @@ ${WT_SEARCH_BOX}    id=searchBox
 ${WT_TABLE}         css=table
 ${WT_ROWS}          css=tbody tr
 &{WT_COLUMNS}       first_name=1    last_name=2    age=3    email=4    salary=5    department=6
+
 
 *** Keywords ***
 Web Tables Page Should Be Loaded
@@ -60,6 +63,7 @@ Get Row Values
     Wait For Elements State    ${row}    visible    timeout=${TIMEOUT}
     &{values}=    Create Dictionary
     FOR    ${field}    ${index}    IN    &{WT_COLUMNS}
-        ${values}[${field}]=    Get Text    ${row}/td[${index}]
+        ${text}=    Get Text    ${row}/td[${index}]
+        Set To Dictionary    ${values}    ${field}=${text}
     END
     RETURN    ${values}

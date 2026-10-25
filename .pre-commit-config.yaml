@@ -1,0 +1,13 @@
+# Git hooks managed by pre-commit (https://pre-commit.com)
+# Install once per clone: pre-commit install
+repos:
+  - repo: local
+    hooks:
+      - id: robocop
+        name: Robocop lint (Robot Framework)
+        # pre-commit installs Robocop in its own environment: no need to activate .venv
+        language: python
+        additional_dependencies: ["robotframework-robocop==9.1.2"]
+        entry: robocop check
+        # Rules and exceptions are configured in robot.toml
+        files: \.(robot|resource)$

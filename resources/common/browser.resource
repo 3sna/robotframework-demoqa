@@ -1,7 +1,8 @@
 *** Settings ***
 Documentation    Browser lifecycle, shared by every page object.
 Library          Browser
-Resource         data.robot
+Resource         data.resource
+
 
 *** Keywords ***
 Open Application

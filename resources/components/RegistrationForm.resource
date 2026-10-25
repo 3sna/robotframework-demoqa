@@ -1,7 +1,9 @@
 *** Settings ***
 Documentation    Component object for the "Registration Form" modal, shared by Add and Edit.
+Library          Collections
 Library          Browser
-Resource         ../common/data.robot
+Resource         ../common/data.resource
+
 
 *** Variables ***
 # The modal loses "show" as soon as it closes, then stays in the DOM until its fade-out ends
@@ -12,6 +14,7 @@ ${RF_CLOSE}     css=.modal-content button.btn-close
 ${RF_INVALID}   css=#userForm input:invalid
 &{RF_FIELDS}    first_name=id=firstName    last_name=id=lastName    age=id=age
 ...             email=id=userEmail         salary=id=salary         department=id=department
+
 
 *** Keywords ***
 Registration Form Should Be Open
@@ -26,7 +29,8 @@ Fill Registration Form
 Get Registration Form Values
     &{values}=    Create Dictionary
     FOR    ${field}    ${locator}    IN    &{RF_FIELDS}
-        ${values}[${field}]=    Get Property    ${locator}    value
+        ${value}=    Get Property    ${locator}    value
+        Set To Dictionary    ${values}    ${field}=${value}
     END
     RETURN    ${values}
 

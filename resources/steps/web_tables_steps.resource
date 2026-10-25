@@ -4,9 +4,10 @@ Documentation    Step definitions: business sentences used by the feature files.
 ...              is written once and can be used with any of them.
 ...              Steps call page and component objects only, never Browser directly.
 Library          Collections
-Resource         ../common/browser.robot
-Resource         ../pages/WebTablesPage.robot
-Resource         ../components/RegistrationForm.robot
+Resource         ../common/browser.resource
+Resource         ../pages/WebTablesPage.resource
+Resource         ../components/RegistrationForm.resource
+
 
 *** Keywords ***
 # --- Context ---
