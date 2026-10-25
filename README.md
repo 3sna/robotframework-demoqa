@@ -204,3 +204,77 @@ Per-OS notes for the agent:
   Python launcher `py`, installed by default with the python.org installer.
   If Jenkins runs as a Windows service, install Python "for all users" so the
   service account can find it.
+
+### Flaky tests: re-run failed tests
+
+By default the pipeline runs every test once, so a single failure fails the
+build. If a test fails now and then on the same code (a flaky test, for
+example a modal that is slow to close on the CI agent), the pipeline can run
+the failed tests a second time and merge both results:
+
+1. `robot` runs the tests as usual.
+2. If some tests failed, `robot --rerunfailed reports/output.xml` runs only
+   those tests again, into `reports/rerun.xml`.
+3. `rebot --merge` combines both runs into `reports/output.xml`, `log.html`
+   and `report.html`. A test that passes the second time is marked PASS, with
+   the message "Test has been re-executed and results merged" and its first
+   failure. A test that fails twice stays FAIL, and so does the build.
+
+Use it as a temporary measure: a re-run hides the symptom, not the cause.
+Check the merged report for re-executed tests, and fix them.
+
+To enable it, replace the `script:` of the `sh(...)` and `bat(...)` calls in
+the `Run Robot Framework Tests` stage of the `Jenkinsfile`.
+
+macOS and Linux (`sh`):
+
+```groovy
+result = sh(
+    script: '''
+        # Jenkins runs sh with -e: keep going after a failed run
+        set +e
+        if [ "$TEST_ID" = "All" ] || [ -z "$TEST_ID" ]; then
+            set -- tests/
+        else
+            set -- --test "*$TEST_ID -*" tests/
+        fi
+        .venv/bin/robot --outputdir reports --variable HEADLESS:True "$@"
+        status=$?
+        if [ $status -ne 0 ] && [ -f reports/output.xml ]; then
+            .venv/bin/robot --outputdir reports --output rerun.xml \
+                --log NONE --report NONE --variable HEADLESS:True \
+                --rerunfailed reports/output.xml tests/
+            .venv/bin/rebot --outputdir reports --output output.xml \
+                --merge reports/output.xml reports/rerun.xml
+            status=$?
+        fi
+        exit $status
+    ''',
+    returnStatus: true
+)
+```
+
+Windows (`bat`):
+
+```groovy
+result = bat(
+    script: '''
+        set FILTER=
+        if not "%TEST_ID%"=="All" if not "%TEST_ID%"=="" set FILTER=--test "*%TEST_ID% -*"
+        .venv\\Scripts\\robot --outputdir reports --variable HEADLESS:True %FILTER% tests
+        set STATUS=%ERRORLEVEL%
+        if "%STATUS%"=="0" goto done
+        if not exist reports\\output.xml goto done
+        .venv\\Scripts\\robot --outputdir reports --output rerun.xml --log NONE --report NONE --variable HEADLESS:True --rerunfailed reports\\output.xml tests
+        .venv\\Scripts\\rebot --outputdir reports --output output.xml --merge reports\\output.xml reports\\rerun.xml
+        set STATUS=%ERRORLEVEL%
+        :done
+        exit /b %STATUS%
+    ''',
+    returnStatus: true
+)
+```
+
+The exit code is the merged result (`rebot` returns the number of failed
+tests), so `ROBOT_EXIT_CODE` and the build status stay correct. The
+`post` section needs no change: it publishes the merged `reports/output.xml`.
