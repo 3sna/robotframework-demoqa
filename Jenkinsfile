@@ -5,6 +5,11 @@ pipeline {
         timestamps()
     }
 
+    environment {
+        // robotframework-browser 20.x needs Python 3.10+; /usr/bin/python3 on macOS is 3.9
+        PYTHON = '/usr/local/bin/python3.13'
+    }
+
     parameters {
         string(
             name: 'TEST_ID',
@@ -25,7 +30,9 @@ pipeline {
         stage('Setup Python and Browser') {
             steps {
                 sh '''
-                    python3 -m venv .venv
+                    # Remove results from previous builds, keep the tracked placeholder
+                    find reports -mindepth 1 ! -name .gitkeep -exec rm -rf {} +
+                    "$PYTHON" -m venv --clear .venv
                     .venv/bin/python -m pip install --upgrade pip
                     .venv/bin/pip install -r requirements.txt
                     .venv/bin/rfbrowser install chromium
