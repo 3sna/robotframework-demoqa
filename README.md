@@ -155,23 +155,28 @@ With the virtual environment activated, the commands are the same on every OS.
 
 All tests, with a visible browser:
 
-    robot tests/
+    robot --outputdir reports tests/
 
 Headless, as in CI:
 
-    robot --variable HEADLESS:True tests/
+    robot --outputdir reports --variable HEADLESS:True tests/
 
 One test by ID:
 
-    robot --test "*TC06 -*" tests/
+    robot --outputdir reports --test "*TC06 -*" tests/
 
 By tag:
 
-    robot --include smoke tests/
-    robot --include negative tests/
+    robot --outputdir reports --include smoke tests/
+    robot --outputdir reports --include negative tests/
 
 Reports are written to `reports/` (`report.html`, `log.html`, `output.xml`,
 plus a screenshot on failure). They are excluded from Git.
+
+`--outputdir reports` is needed on the command line: the `robot` command does
+not read `robot.toml`. Only RobotCode (the PyCharm and VS Code plugin, or
+`robotcode robot`) uses its `output-dir = "reports"` setting. Without the
+option, the reports are written to the folder the command is run from.
 
 ## Code quality
 
